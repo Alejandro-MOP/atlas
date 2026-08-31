@@ -4,7 +4,7 @@
 
 ## Current Status
 
-ATLAS está en F1 — Training Tracker. F0 está completa y F1-001 implementó el modelo PRESCRIBED y su persistencia. El modelo ACTUAL (`WorkoutSession`, `ExercisePerformance`, `SetLog`) todavía no está implementado.
+ATLAS está en F1 — Training Tracker. F0 está completa, F1-001A está cerrada y F1-002 es el siguiente paso. El modelo ACTUAL (`WorkoutSession`, `ExercisePerformance`, `SetLog`) todavía no está implementado.
 
 ## Tech Stack
 

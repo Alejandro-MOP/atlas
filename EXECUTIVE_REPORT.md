@@ -70,13 +70,13 @@ HealthKit, Apple Health, Apple Watch, App Intents y Siri son integraciones futur
 
 ## Current Capabilities
 
-El código actual ofrece monorepo pnpm TypeScript, app Expo Router mínima, API Fastify, PostgreSQL/Drizzle, modelo prescrito persistente, catálogo de movements/exercises/variants, Zod runtime validation, seed, plan API, tests y quality scripts. La API incluye health, CRUD mínimo de catálogo y creación/consulta de atletas y planes.
+El código actual ofrece monorepo pnpm TypeScript, app Expo Router mínima, API Fastify, PostgreSQL/Drizzle, modelo prescrito persistente, catálogo de movements/exercises/variants, Zod runtime validation, validación relacional, seed, plan API anidada, tests de integración y quality scripts. La API incluye health, CRUD mínimo de catálogo y creación/consulta de atletas y planes.
 
 No están implementados sesiones reales, SetLog, dashboards, engines de recomendación, nutrition UI, Apple Health, auth, Siri, Watch ni AI.
 
 ## Current Status
 
-F0 está completa. F1 está en progreso: el modelo prescrito está disponible y la capa ACTUAL permanece pendiente. Consulta el [ROADMAP](ROADMAP.md) para estados y delivery.
+F0 está completa. F1 está en progreso: el modelo prescrito y su hardening están disponibles; la capa ACTUAL permanece pendiente. Consulta el [ROADMAP](ROADMAP.md) para estados y delivery.
 
 ## Roadmap Summary
 
@@ -92,4 +92,4 @@ F0 Foundation → F1 Training Tracker → F2 Load Adjustment → F3 Athlete Cont
 
 ## Next Milestone
 
-La dirección de delivery es F1-001A como hardening del modelo prescrito y posteriormente F1-002 para el modelo ACTUAL. Ninguno de esos trabajos se implementa en este documento.
+F1-001A está cerrado con el catálogo y las invariantes del modelo prescrito verificados. La siguiente milestone es F1-002 para el modelo ACTUAL.

@@ -1,0 +1,18 @@
+{
+  "name": "atlas",
+  "version": "0.1.0",
+  "private": true,
+  "description": "ATLAS — Adaptive Training & Load Analysis System",
+  "packageManager": "pnpm@9.15.5",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "dev": "corepack pnpm --parallel --filter @atlas/api --filter @atlas/mobile dev",
+    "dev:api": "corepack pnpm --filter @atlas/api dev",
+    "dev:mobile": "corepack pnpm --filter @atlas/mobile dev",
+    "lint": "corepack pnpm -r lint",
+    "typecheck": "corepack pnpm -r build && corepack pnpm -r typecheck",
+    "test": "corepack pnpm -r test",
+    "build": "corepack pnpm -r build"
+  },
+  "devDependencies": { "@types/node": "^22.10.5", "@typescript-eslint/parser": "^8.19.1", "eslint": "^9.17.0", "prettier": "^3.4.2", "typescript": "^5.7.2", "vitest": "^2.1.8" }
+}

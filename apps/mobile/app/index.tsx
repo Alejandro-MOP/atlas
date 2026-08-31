@@ -1,0 +1,3 @@
+import { StyleSheet, Text, View } from 'react-native';
+export default function Home() { return <View style={styles.container}><Text style={styles.title}>ATLAS</Text><Text style={styles.subtitle}>Adaptive Training & Load Analysis System</Text><Text style={styles.status}>Foundation initialized.</Text></View>; }
+const styles = StyleSheet.create({ container: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24, backgroundColor: '#101418' }, title: { color: '#f4f7f8', fontSize: 40, fontWeight: '800', letterSpacing: 4 }, subtitle: { color: '#a9b6bc', fontSize: 16, textAlign: 'center', marginTop: 12 }, status: { color: '#7dd3a8', fontSize: 15, marginTop: 32 } });

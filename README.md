@@ -1,49 +1,175 @@
 # ATLAS
 
-**Adaptive Training & Load Analysis System** es una plataforma futura de seguimiento y asistencia para fuerza, powerlifting e hipertrofia. Este repositorio contiene únicamente **ATLAS-F0-001 — Bootstrap + Architecture Foundation**.
+**Adaptive Training & Load Analysis System** es una plataforma de seguimiento y asistencia para fuerza, powerlifting e hipertrofia.
 
-## Estado actual
+## Current Status
 
-La foundation incluye un monorepo TypeScript con paquetes de dominio, contratos y engines puros; una API Fastify con `GET /health`; una app Expo Router mínima; y PostgreSQL/Drizzle preparado para crecer. No hay todavía tracker de entrenamientos, recomendaciones, catálogo de ejercicios ni reglas de negocio de F1.
+ATLAS está en F1 — Training Tracker. F0 está completa y F1-001 implementó el modelo PRESCRIBED y su persistencia. El modelo ACTUAL (`WorkoutSession`, `ExercisePerformance`, `SetLog`) todavía no está implementado.
 
-## Arquitectura
+## Tech Stack
 
-`packages/domain` contiene tipos y value objects puros. `packages/contracts` contiene DTOs compartidos. `packages/engine-core` define puertos y un servicio puro de redondeo de carga. `services/api` coordina HTTP y la infraestructura Drizzle/PostgreSQL. `apps/mobile` contiene presentación y navegación. La API es un modular monolith, no microservicios.
+- Node.js 22+ y TypeScript strict.
+- pnpm workspaces.
+- Expo, React Native y Expo Router.
+- Fastify sobre Node.js.
+- PostgreSQL y Drizzle ORM.
+- Vitest, ESLint y Prettier.
 
-## Inicio rápido
+## Architecture
 
-Requiere Node.js 22+ y pnpm 9.15.5.
-
-```sh
-pnpm install
-cp .env.example .env
-docker compose up -d       # opcional, PostgreSQL local
-pnpm dev:api               # http://localhost:3000/health
-pnpm dev:mobile            # Expo
-```
-
-El PostgreSQL local se publica en `localhost:55432` para evitar conflictos con instalaciones existentes en el puerto `5432`.
-
-Comandos de calidad: `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build`. El esquema Drizzle vive en `services/api/src/db/schema`; las migraciones se generan con `pnpm --filter @atlas/api db:generate` y se aplican con `pnpm --filter @atlas/api db:migrate`.
-
-## Estructura
+ATLAS es un modular monolith. La dirección de dependencias es:
 
 ```text
-apps/mobile       Expo + Expo Router
-services/api      Fastify, configuración y Drizzle
-packages/domain   entidades, value objects y reglas puras
-packages/contracts DTOs HTTP compartidos
-packages/engine-core puertos de engines y LoadRoundingService
-docs/architecture contexto y mapa de dependencias
-docs/adr          decisiones de arquitectura
+Mobile
+  ↓
+API
+  ↓
+Application
+ ↙       ↘
+Domain   Engine Core
+  ↓
+Repositories
+  ↓
+PostgreSQL
 ```
 
-## Roadmap
+`packages/domain` y `packages/engine-core` son puros: no dependen de React Native, Fastify, Drizzle ni PostgreSQL. `services/api` coordina HTTP, aplicación y persistencia. Los engines futuros serán determinísticos y reutilizables; mobile no contiene lógica central de recomendaciones.
 
-F0 Foundation · F1 Training Tracker · F2 Load Adjustment Engine · F3 Athlete Context · F4 Nutrition & Caffeine · F5 Apple Health · F6 Historical Import · F7 Analytics · F8 Progression Engine · F9 Pivot Engine · F10 Readiness & Fatigue · F11 Powerlifting Engine · F12 Siri & Apple Watch · F13 ATLAS Intelligence.
+## Repository Structure
 
-## Futuro y límites deliberados
+```text
+apps/mobile          Expo + Expo Router
+services/api         Fastify, application, repositories y Drizzle
+packages/domain      entidades, tipos y value objects
+packages/contracts   DTOs y validación compartida con Zod
+packages/engine-core puertos de engines y load rounding
+ROADMAP.md           delivery y dirección futura
+EXECUTIVE_REPORT.md  visión y estado de producto
+```
 
-El modelo contempla `Movement → Exercise → ExerciseVariant → Modifiers/Execution context`, perfiles de equipamiento por gimnasio, recomendaciones explicables con confidence y contextos MORNING/PRE_WORKOUT/END_OF_DAY. CaffeineIntake será un evento temporal. HealthKit, App Intents, Watch y AI Coach quedan documentados, sin dependencias nativas en F0. El principio de atleta es “registrar primero, interpretar después”.
+## Training Domain
 
-No se ha creado ningún commit.
+El modelo prescrito persistente es:
+
+```text
+Athlete
+└── Mesocycle
+    └── TrainingWeek
+        └── WorkoutDay
+            └── ExercisePrescription
+                └── PrescriptionSet
+```
+
+Las prescriptions se relacionan con `Movement → Exercise → ExerciseVariant`. `ExerciseVariant.modifiers` es JSON estructurado para tempo, pausas, postura y otros modificadores sin crear cientos de columnas.
+
+## Planned vs Actual Training
+
+F1-001 implementó únicamente `PLANNED`:
+
+```text
+Athlete → Mesocycle → TrainingWeek → WorkoutDay → ExercisePrescription → PrescriptionSet
+```
+
+`ACTUAL` será una capa separada y futura:
+
+```text
+WorkoutSession → SessionExercise / ExercisePerformance → SetLog
+```
+
+No hay sesiones reales ni set logs en el código actual.
+
+## Exercise Model
+
+El catálogo actual distingue movement, exercise y variant. `MovementPattern` y `ExerciseRole` son enums compartidos entre dominio, contratos y PostgreSQL. Las relaciones incluyen validación de existencia y una variant debe pertenecer al exercise usado por una prescription.
+
+## Recommendation Architecture
+
+El contrato preparado es `Recommendation<T>` con `value`, `confidence`, `reasons` y `evidence` opcional. `engine-core` expone puertos para engines futuros, pero no implementa recomendaciones ni LoadAdjustmentEngine funcional.
+
+## Equipment / Load Rounding
+
+`EquipmentProfile` y `NearestPlateLoadRoundingService` permiten redondeo puro según discos configurados. No hay perfiles de gimnasio hardcodeados.
+
+## API
+
+| Method | Path | Purpose |
+|---|---|---|
+| GET | `/health` | Estado de la API |
+| POST | `/athletes` | Crear atleta |
+| GET | `/athletes/:id` | Consultar atleta |
+| POST | `/movements` | Crear movement |
+| GET | `/movements/:id` | Consultar movement |
+| POST | `/exercises` | Crear exercise |
+| GET | `/exercises/:id` | Consultar exercise |
+| POST | `/exercises/:exerciseId/variants` | Crear variant |
+| GET | `/exercise-variants/:id` | Consultar variant |
+| POST | `/mesocycles` | Crear mesociclo |
+| GET | `/mesocycles/:id` | Consultar mesociclo |
+| POST | `/mesocycles/:mesocycleId/weeks` | Crear semana |
+| POST | `/training-weeks/:trainingWeekId/days` | Crear día |
+| POST | `/workout-days/:workoutDayId/prescriptions` | Crear prescription y sets |
+| GET | `/mesocycles/:id/plan` | Consultar plan anidado |
+
+## Database
+
+PostgreSQL se ejecuta localmente con Docker Compose y se publica en `localhost:55432`. Drizzle mantiene schema y migraciones en `services/api/src/db`. Las tablas principales son `athletes`, `mesocycles`, `training_weeks`, `workout_days`, `movements`, `exercises`, `exercise_variants`, `exercise_prescriptions` y `prescription_sets`.
+
+```sh
+corepack pnpm install
+cp .env.example .env
+docker compose up -d
+corepack pnpm db:generate
+corepack pnpm db:migrate
+corepack pnpm db:seed
+```
+
+Variables: `DATABASE_URL` y `API_PORT`. No guardar secretos en el repositorio.
+
+## Runtime Validation
+
+Los contratos HTTP se validan con Zod antes de llegar a application services. Se comprueban IDs, strings, enums, rangos de RIR/RPE/peso, repeticiones, orden y coherencia min/max. PostgreSQL refuerza invariantes numéricas mediante CHECK constraints y relaciones mediante FKs.
+
+## Development Setup
+
+Requiere Node.js 22+ y pnpm 9.15.5. La API puede arrancar con `corepack pnpm dev:api`; mobile con `corepack pnpm dev:mobile`.
+
+## Commands
+
+```sh
+corepack pnpm dev
+corepack pnpm dev:api
+corepack pnpm dev:mobile
+corepack pnpm lint
+corepack pnpm typecheck
+corepack pnpm test
+corepack pnpm build
+```
+
+## Testing / Quality
+
+Vitest cubre invariantes de dominio, redondeo de carga y health/input validation de API. ESLint, TypeScript strict, build y Prettier forman la baseline de calidad.
+
+## Architecture Decisions
+
+- **Monorepo**: pnpm workspaces coordinan mobile, API y paquetes compartidos.
+- **Modular monolith**: una API modular evita el coste prematuro de microservicios.
+- **Domain / Engine / Infrastructure**: dominio y engines puros no conocen frameworks ni persistencia.
+- **Exercise model**: `Movement → Exercise → ExerciseVariant → Modifiers / Execution Context`.
+- **Personalization**: datos y configuración, nunca hardcodes de atletas, gimnasios o bebidas.
+- **Recommendations**: value, confidence, reasons y evidence; la confianza refleja la evidencia.
+- **Data handling**: registrar primero e interpretar después.
+- **Apple platform**: HealthKit, Apple Health, Siri y Watch serán adaptadores futuros desacoplados.
+- **PLANNED vs ACTUAL**: la prescription del coach y el desempeño del atleta son modelos separados.
+- **Runtime validation**: Zod valida contratos HTTP en el límite de la aplicación.
+
+## Documentation
+
+- [ROADMAP.md](ROADMAP.md): delivery, estados y dirección futura.
+- [EXECUTIVE_REPORT.md](EXECUTIVE_REPORT.md): visión, producto y estado ejecutivo.
+
+## Documentation Maintenance
+
+- README: actualizar cuando cambien arquitectura, setup, API, database, domain model o workflow.
+- ROADMAP: actualizar cuando cambie el estado de una fase/ticket o aparezca una decisión futura.
+- EXECUTIVE_REPORT: actualizar sólo ante cambios materiales de capacidades, visión, riesgos o dirección.
+- Git: fuente de verdad del detalle histórico exacto.

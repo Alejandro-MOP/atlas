@@ -2,6 +2,7 @@ import { WeightKg } from './shared/value-objects.js';
 export * from './shared/value-objects.js';
 export * from './exercises/types.js';
 export * from './training/types.js';
+export * from './training/actual.js';
 export type Recommendation<T> = { value: T; confidence: number; reasons: string[]; evidence?: string[] };
 export type EquipmentProfile = { name: string; barWeightKg?: WeightKg; availablePlatesKg: WeightKg[]; machineIncrementsKg?: WeightKg[] };
 export type CaffeineSourceType = 'COFFEE' | 'TEA' | 'MATCHA' | 'ENERGY_DRINK' | 'PRE_WORKOUT' | 'SUPPLEMENT' | 'OTHER';

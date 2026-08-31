@@ -23,8 +23,8 @@ ACTUAL (futuro): WorkoutSession → SessionExercise / ExercisePerformance → Se
 
 - **F1-001 — Training Domain + Persistence Model · ✅ COMPLETE**: modelo prescrito, persistencia y plan API.
 - **F1-001A — Prescribed Model Hardening · ✅ COMPLETE**: hardening del catálogo, invariantes relacionales y cobertura adicional.
-- **F1-002 — Workout Sessions + Set Logging · ⏳ NEXT**: modelo ACTUAL.
-- **F1-003 — Mobile Training Experience · ⬜ PLANNED**: consultar planes, iniciar sesiones y registrar sets.
+- **F1-002 — Workout Sessions + Set Logging · ✅ COMPLETE**: modelo ACTUAL, sesiones planificadas/no planificadas, performances, sets y completion.
+- **F1-003 — Mobile Training Experience · ⏳ NEXT**: consultar planes, iniciar sesiones y registrar sets.
 
 ### F2 — Load Adjustment Engine · ⬜ PLANNED
 
@@ -79,6 +79,7 @@ Capa conversacional posterior a analytics y engines determinísticos; no reempla
 - **F0-001 — Bootstrap + Architecture Foundation · ✅ COMPLETE**: monorepo, API, mobile, PostgreSQL/Drizzle, domain, contracts, engine-core, health endpoint y ADRs.
 - **F1-001 — Training Domain + Persistence Model · ✅ COMPLETE**: modelo prescrito, persistencia, validación, seed y plan API.
 - **F1-001A — Prescribed Model Hardening · ✅ COMPLETE**: catálogo usable, relaciones protegidas, constraints consistentes y flujo API probado.
+- **F1-002 — Workout Sessions + Set Logging · ✅ COMPLETE**: persistencia ACTUAL, relación opcional con PLANNED, sets extra y API de sesiones.
 
 ## Idea Parking Lot
 

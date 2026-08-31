@@ -1,6 +1,6 @@
 import Fastify from 'fastify';
 import { ZodError } from 'zod';
-import { createAthleteSchema, createExercisePrescriptionSchema, createExerciseSchema, createExerciseVariantSchema, createMesocycleSchema, createMovementSchema, createTrainingWeekSchema, createWorkoutDaySchema } from '@atlas/contracts';
+import { createAthleteSchema, createExercisePerformanceSchema, createExercisePrescriptionSchema, createExerciseSchema, createExerciseVariantSchema, createMesocycleSchema, createMovementSchema, createSetLogSchema, createTrainingWeekSchema, createWorkoutDaySchema, createWorkoutSessionSchema } from '@atlas/contracts';
 import type { HealthResponse } from '@atlas/contracts';
 import { application } from './application.js';
 import { repositories } from './repositories.js';
@@ -21,4 +21,9 @@ export function buildApp() { const app = Fastify({ logger: true }); app.setError
   app.post('/training-weeks/:trainingWeekId/days', async (request, reply) => { const input = createWorkoutDaySchema.parse({ ...(request.body as object), trainingWeekId: (request.params as { trainingWeekId: string }).trainingWeekId }); return reply.code(201).send(await handle(app, () => application.createWorkoutDay(input))); });
   app.post('/workout-days/:workoutDayId/prescriptions', async (request, reply) => { const input = createExercisePrescriptionSchema.parse({ ...(request.body as object), workoutDayId: (request.params as { workoutDayId: string }).workoutDayId }); return reply.code(201).send(await handle(app, () => application.createExercisePrescription(input))); });
   app.get('/mesocycles/:id/plan', async (request, reply) => { const result = await handle(app, () => repositories.getPlan((request.params as { id: string }).id)); if (!result) return reply.code(404).send({ error: 'Mesocycle not found' }); return result; });
+  app.post('/workout-sessions', async (request, reply) => { const input = createWorkoutSessionSchema.parse(request.body); return reply.code(201).send(await handle(app, () => application.createWorkoutSession(input))); });
+  app.get('/workout-sessions/:id', async (request, reply) => { const result = await handle(app, () => application.getWorkoutSession((request.params as { id: string }).id)); if (!result) return reply.code(404).send({ error: 'Workout session not found' }); return result; });
+  app.post('/workout-sessions/:workoutSessionId/exercises', async (request, reply) => { const input = createExercisePerformanceSchema.parse({ ...(request.body as object), workoutSessionId: (request.params as { workoutSessionId: string }).workoutSessionId }); return reply.code(201).send(await handle(app, () => application.addExercisePerformance(input))); });
+  app.post('/exercise-performances/:exercisePerformanceId/sets', async (request, reply) => { const input = createSetLogSchema.parse({ ...(request.body as object), exercisePerformanceId: (request.params as { exercisePerformanceId: string }).exercisePerformanceId }); return reply.code(201).send(await handle(app, () => application.addSetLog(input))); });
+  app.patch('/workout-sessions/:id/complete', async (request, reply) => { const result = await handle(app, () => application.completeWorkoutSession((request.params as { id: string }).id)); if (!result) return reply.code(404).send({ error: 'Workout session not found' }); return result; });
   return app; }

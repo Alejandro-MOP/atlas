@@ -4,7 +4,7 @@
 
 ## Current Status
 
-ATLAS está en F1 — Training Tracker. F0 está completa, F1-001A está cerrada y F1-002 es el siguiente paso. El modelo ACTUAL (`WorkoutSession`, `ExercisePerformance`, `SetLog`) todavía no está implementado.
+ATLAS está en F1 — Training Tracker. F0, F1-001A y F1-002 están completas; F1-003 es el siguiente paso. El modelo ACTUAL ya permite registrar sesiones, performances y sets, pero todavía no existen recomendaciones ni analytics.
 
 ## Tech Stack
 
@@ -76,7 +76,7 @@ Athlete → Mesocycle → TrainingWeek → WorkoutDay → ExercisePrescription �
 WorkoutSession → SessionExercise / ExercisePerformance → SetLog
 ```
 
-No hay sesiones reales ni set logs en el código actual.
+El modelo ACTUAL ya permite sesiones reales y set logs; F1-002 no calcula recomendaciones, fatigue, volumen ni analytics.
 
 ## Exercise Model
 
@@ -109,10 +109,15 @@ El contrato preparado es `Recommendation<T>` con `value`, `confidence`, `reasons
 | POST | `/training-weeks/:trainingWeekId/days` | Crear día |
 | POST | `/workout-days/:workoutDayId/prescriptions` | Crear prescription y sets |
 | GET | `/mesocycles/:id/plan` | Consultar plan anidado |
+| POST | `/workout-sessions` | Crear sesión real |
+| GET | `/workout-sessions/:id` | Consultar sesión con ejercicios y sets |
+| POST | `/workout-sessions/:workoutSessionId/exercises` | Añadir ejercicio ejecutado |
+| POST | `/exercise-performances/:exercisePerformanceId/sets` | Registrar set ejecutado |
+| PATCH | `/workout-sessions/:id/complete` | Completar sesión |
 
 ## Database
 
-PostgreSQL se ejecuta localmente con Docker Compose y se publica en `localhost:55432`. Drizzle mantiene schema y migraciones en `services/api/src/db`. Las tablas principales son `athletes`, `mesocycles`, `training_weeks`, `workout_days`, `movements`, `exercises`, `exercise_variants`, `exercise_prescriptions` y `prescription_sets`.
+PostgreSQL se ejecuta localmente con Docker Compose y se publica en `localhost:55432`. Drizzle mantiene schema y migraciones en `services/api/src/db`. Además de las tablas PLANNED, existen `workout_sessions`, `exercise_performances` y `set_logs` para ACTUAL.
 
 ```sh
 corepack pnpm install

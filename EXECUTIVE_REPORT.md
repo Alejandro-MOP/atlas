@@ -50,7 +50,7 @@ Athlete
                 └── PrescriptionSet
 ```
 
-Se relaciona con `Movement → Exercise → ExerciseVariant`, cuyos modifiers permiten flexibilidad estructurada. F1-001 implementó únicamente PLANNED. ACTUAL será `WorkoutSession → SessionExercise / ExercisePerformance → SetLog` en F1-002 y todavía no está implementado.
+Se relaciona con `Movement → Exercise → ExerciseVariant`, cuyos modifiers permiten flexibilidad estructurada. F1-001 implementó PLANNED y F1-002 añadió ACTUAL: `WorkoutSession → ExercisePerformance → SetLog`. Ambas capas pueden relacionarse cuando existe prescription, y las sesiones libres también son válidas.
 
 ## Data Strategy
 
@@ -70,13 +70,13 @@ HealthKit, Apple Health, Apple Watch, App Intents y Siri son integraciones futur
 
 ## Current Capabilities
 
-El código actual ofrece monorepo pnpm TypeScript, app Expo Router mínima, API Fastify, PostgreSQL/Drizzle, modelo prescrito persistente, catálogo de movements/exercises/variants, Zod runtime validation, validación relacional, seed, plan API anidada, tests de integración y quality scripts. La API incluye health, CRUD mínimo de catálogo y creación/consulta de atletas y planes.
+El código actual ofrece monorepo pnpm TypeScript, app Expo Router mínima, API Fastify, PostgreSQL/Drizzle, modelos PLANNED y ACTUAL persistentes, catálogo, Zod runtime validation, validación relacional, seed, plan API, sesiones con performances/sets, completion, tests de integración y quality scripts.
 
-No están implementados sesiones reales, SetLog, dashboards, engines de recomendación, nutrition UI, Apple Health, auth, Siri, Watch ni AI.
+No están implementados dashboards, engines de recomendación, nutrition UI, Apple Health, auth, Siri, Watch ni AI.
 
 ## Current Status
 
-F0 está completa. F1 está en progreso: el modelo prescrito y su hardening están disponibles; la capa ACTUAL permanece pendiente. Consulta el [ROADMAP](ROADMAP.md) para estados y delivery.
+F0 está completa. F1 está en progreso: PLANNED y ACTUAL están disponibles; la experiencia mobile completa y los engines permanecen pendientes. Consulta el [ROADMAP](ROADMAP.md) para estados y delivery.
 
 ## Roadmap Summary
 
@@ -92,4 +92,4 @@ F0 Foundation → F1 Training Tracker → F2 Load Adjustment → F3 Athlete Cont
 
 ## Next Milestone
 
-F1-001A está cerrado con el catálogo y las invariantes del modelo prescrito verificados. La siguiente milestone es F1-002 para el modelo ACTUAL.
+F1-001A y F1-002 están cerrados. La siguiente milestone es F1-003 para la experiencia mobile de entrenamiento.

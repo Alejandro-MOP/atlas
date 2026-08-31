@@ -1,3 +1,24 @@
 import Fastify from 'fastify';
+import { ZodError } from 'zod';
+import { createAthleteSchema, createExercisePrescriptionSchema, createExerciseSchema, createExerciseVariantSchema, createMesocycleSchema, createMovementSchema, createTrainingWeekSchema, createWorkoutDaySchema } from '@atlas/contracts';
 import type { HealthResponse } from '@atlas/contracts';
-export function buildApp() { const app = Fastify({ logger: true }); app.get('/health', async (): Promise<HealthResponse> => ({ status: 'ok', service: 'atlas-api' })); return app; }
+import { application } from './application.js';
+import { repositories } from './repositories.js';
+function handle(app: ReturnType<typeof Fastify>, action: () => Promise<unknown>) { return action().catch((error: unknown) => { app.log.error(error); const message = error instanceof Error ? error.message : 'Request failed'; throw Object.assign(new Error(message), { statusCode: message.includes('DATABASE_URL') ? 503 : 400 }); }); }
+export function buildApp() { const app = Fastify({ logger: true }); app.setErrorHandler((error, _request, reply) => { const statusCode = error instanceof ZodError ? 400 : (error as { code?: string }).code === '23505' ? 409 : (error as { statusCode?: number }).statusCode ?? 500; const message = error instanceof Error ? error.message : 'Request failed'; reply.code(statusCode).send({ error: message }); });
+  app.get('/health', async (): Promise<HealthResponse> => ({ status: 'ok', service: 'atlas-api' }));
+  app.post('/movements', async (request, reply) => reply.code(201).send(await handle(app, () => application.createMovement(createMovementSchema.parse(request.body)))));
+  app.get('/movements/:id', async (request, reply) => { const result = await handle(app, () => application.getMovement((request.params as { id: string }).id)); if (!result) return reply.code(404).send({ error: 'Movement not found' }); return result; });
+  app.post('/exercises', async (request, reply) => reply.code(201).send(await handle(app, () => application.createExercise(createExerciseSchema.parse(request.body)))));
+  app.get('/exercises/:id', async (request, reply) => { const result = await handle(app, () => application.getExercise((request.params as { id: string }).id)); if (!result) return reply.code(404).send({ error: 'Exercise not found' }); return result; });
+  app.post('/exercises/:exerciseId/variants', async (request, reply) => { const input = createExerciseVariantSchema.parse({ ...(request.body as object), exerciseId: (request.params as { exerciseId: string }).exerciseId }); return reply.code(201).send(await handle(app, () => application.createVariant(input))); });
+  app.get('/exercise-variants/:id', async (request, reply) => { const result = await handle(app, () => application.getVariant((request.params as { id: string }).id)); if (!result) return reply.code(404).send({ error: 'Exercise variant not found' }); return result; });
+  app.post('/athletes', async (request, reply) => { const input = createAthleteSchema.parse(request.body); return reply.code(201).send(await handle(app, () => application.createAthlete(input))); });
+  app.get('/athletes/:id', async (request, reply) => { const result = await handle(app, () => repositories.getAthlete((request.params as { id: string }).id)); if (!result) return reply.code(404).send({ error: 'Athlete not found' }); return result; });
+  app.post('/mesocycles', async (request, reply) => { const input = createMesocycleSchema.parse(request.body); return reply.code(201).send(await handle(app, () => application.createMesocycle(input))); });
+  app.get('/mesocycles/:id', async (request, reply) => { const result = await handle(app, () => repositories.getMesocycle((request.params as { id: string }).id)); if (!result) return reply.code(404).send({ error: 'Mesocycle not found' }); return result; });
+  app.post('/mesocycles/:mesocycleId/weeks', async (request, reply) => { const input = createTrainingWeekSchema.parse({ ...(request.body as object), mesocycleId: (request.params as { mesocycleId: string }).mesocycleId }); return reply.code(201).send(await handle(app, () => application.createTrainingWeek(input))); });
+  app.post('/training-weeks/:trainingWeekId/days', async (request, reply) => { const input = createWorkoutDaySchema.parse({ ...(request.body as object), trainingWeekId: (request.params as { trainingWeekId: string }).trainingWeekId }); return reply.code(201).send(await handle(app, () => application.createWorkoutDay(input))); });
+  app.post('/workout-days/:workoutDayId/prescriptions', async (request, reply) => { const input = createExercisePrescriptionSchema.parse({ ...(request.body as object), workoutDayId: (request.params as { workoutDayId: string }).workoutDayId }); return reply.code(201).send(await handle(app, () => application.createExercisePrescription(input))); });
+  app.get('/mesocycles/:id/plan', async (request, reply) => { const result = await handle(app, () => repositories.getPlan((request.params as { id: string }).id)); if (!result) return reply.code(404).send({ error: 'Mesocycle not found' }); return result; });
+  return app; }

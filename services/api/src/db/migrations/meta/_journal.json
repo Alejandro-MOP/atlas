@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1788182894669,
+      "tag": "0000_overjoyed_micromacro",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1788183847014,
+      "tag": "0001_old_elektra",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1788193706433,
+      "tag": "0002_panoramic_skaar",
+      "breakpoints": true
+    }
+  ]
+}

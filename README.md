@@ -22,6 +22,8 @@ pnpm dev:api               # http://localhost:3000/health
 pnpm dev:mobile            # Expo
 ```
 
+El PostgreSQL local se publica en `localhost:55432` para evitar conflictos con instalaciones existentes en el puerto `5432`.
+
 Comandos de calidad: `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build`. El esquema Drizzle vive en `services/api/src/db/schema`; las migraciones se generan con `pnpm --filter @atlas/api db:generate` y se aplican con `pnpm --filter @atlas/api db:migrate`.
 
 ## Estructura

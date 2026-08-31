@@ -1,0 +1,12 @@
+import { nonEmpty, positive, Reps, Rir, Rpe, WeightKg } from '../shared/value-objects.js';
+export type MesocycleStatus = 'DRAFT' | 'ACTIVE' | 'COMPLETED' | 'ARCHIVED';
+export type WeekType = 'STANDARD' | 'PIVOT' | 'DELOAD' | 'TEST' | 'OTHER';
+export type Athlete = { id: string; displayName: string; createdAt: Date; updatedAt: Date };
+export type Mesocycle = { id: string; athleteId: string; name: string; sequenceNumber?: number; description?: string; status: MesocycleStatus; startDate?: Date; endDate?: Date; createdAt: Date; updatedAt: Date };
+export type TrainingWeek = { id: string; mesocycleId: string; weekNumber: number; name?: string; weekType: WeekType; notes?: string };
+export type WorkoutDay = { id: string; trainingWeekId: string; dayNumber: number; name: string; notes?: string; sortOrder: number };
+export type PrescriptionSet = { id: string; exercisePrescriptionId: string; setNumber: number; targetReps: Reps; targetRir?: Rir; targetRpe?: Rpe; targetWeightKg?: WeightKg; minReps?: Reps; maxReps?: Reps; notes?: string };
+export type ExercisePrescription = { id: string; workoutDayId: string; exerciseId: string; exerciseVariantId?: string; exerciseRole: import('../exercises/types.js').ExerciseRole; sortOrder: number; notes?: string; sets: PrescriptionSet[] };
+export function validateMesocycle(input: Pick<Mesocycle, 'athleteId'|'name'|'status'> & { sequenceNumber?: number }): void { nonEmpty(input.athleteId, 'athleteId'); nonEmpty(input.name, 'name'); if (input.sequenceNumber !== undefined) positive(input.sequenceNumber, 'sequenceNumber'); }
+export function validateTrainingWeek(input: Pick<TrainingWeek, 'mesocycleId'|'weekNumber'>): void { nonEmpty(input.mesocycleId, 'mesocycleId'); positive(input.weekNumber, 'weekNumber'); }
+export function validatePrescriptionSet(input: { setNumber: number; targetReps: number; minReps?: number; maxReps?: number; targetRir?: number; targetRpe?: number; targetWeightKg?: number }): void { positive(input.setNumber, 'setNumber'); new Reps(input.targetReps); if (input.minReps !== undefined) new Reps(input.minReps); if (input.maxReps !== undefined) new Reps(input.maxReps); if (input.minReps !== undefined && input.maxReps !== undefined && input.minReps > input.maxReps) throw new Error('minReps cannot exceed maxReps'); if (input.targetRir !== undefined) new Rir(input.targetRir); if (input.targetRpe !== undefined) new Rpe(input.targetRpe); if (input.targetWeightKg !== undefined) new WeightKg(input.targetWeightKg); }
